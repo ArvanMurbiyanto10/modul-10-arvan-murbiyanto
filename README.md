@@ -13,7 +13,7 @@
 
   <br />
 
-  <img width="512" height="512" alt="telyu" src="https://github.com/user-attachments/assets/22ae9b17-5e73-48a6-b5dd-281e6c70613e" />
+  <img src="images/logotelu.png" width="150" />
 
   <br />
   <br />
@@ -22,9 +22,9 @@
   <h3>Disusun Oleh :</h3>
 
   <p>
-    <strong>Arvan Murbiyantoo</strong><br>
-    <strong>2311102074</strong><br>
-    <strong>S1 IF-11-04</strong>
+    <strong>Arvan Murbiyanto</strong><br>
+    <strong>2311102064</strong><br>
+    <strong>S1 IF-11-04 </strong>
   </p>
 
   <br />
@@ -32,336 +32,533 @@
   <h3>Dosen Pengampu :</h3>
 
   <p>
-    <strong>Cahyo Prihantoro, S.Kom., M.Eng. </strong>
+    <strong>Cahyo Prihantoro, S.Kom., M.Eng.</strong>
   </p>
   
   <br />
+
   <h3>LABORATORIUM HIGH PERFORMANCE
  <br>FAKULTAS INFORMATIKA <br>UNIVERSITAS TELKOM PURWOKERTO <br>2026</h3>
 </div>
 
-<hr>
+---
 
-# Dasar Praktikum
+## 1. Dasar Teori
 
-Buat sebuah halaman web yang bisa mengambil data dari server lalu menampilkannya di halaman tanpa perlu reload.
+### Pengertian AJAX
 
-_Instruksi Detail:_
+AJAX (_Asynchronous JavaScript and XML_) adalah teknik pengembangan web yang memungkinkan aplikasi web untuk mengirim dan menerima data dari _server_ tanpa harus _me-refresh_ (_reload_) seluruh halaman. Meskipun namanya mengandung XML, AJAX sekarang lebih sering menggunakan format JSON (_JavaScript Object Notation_) karena lebih ringan dan mudah _di-parse_ oleh JavaScript. Dengan AJAX, pengalaman pengguna menjadi lebih _smooth_ dan _responsive_ karena hanya bagian tertentu dari halaman yang diperbarui.
 
-1. _Membuat File Server_ (data.php)
-   Buat file PHP yang berfungsi sebagai “database sederhana”.
-   Data cukup berupa array (misalnya: nama, pekerjaan, lokasi).
-   Contoh data:
+### Cara Kerja AJAX
 
-['nama' => 'Budi', 'pekerjaan' => 'Web Developer', 'lokasi' => 'Jakarta']
-Ubah data tersebut menjadi format JSON menggunakan json_encode().
-Tampilkan hasilnya dengan echo.
+Proses AJAX bekerja secara _asynchronous_ (tidak sinkron), artinya JavaScript dapat melanjutkan eksekusi kode lain sambil menunggu respons dari _server_. Alur kerjanya adalah:
 
-Jangan lupa tambahkan header:
+- `Trigger Event`: _User_ melakukan aksi (misal: klik tombol)
+  Create
+- `XMLHttpRequest/Fetch`: Browser membuat objek untuk mengirim _request_
+- `Send Request`: _Request_ dikirim ke _server_ (GET/POST)
+- `*Server* Process`: _Server_ memproses _request_ dan mengembalikan data (biasanya JSON)
+- `Response Handling`: JavaScript menerima _response_ dan memperbarui DOM
+
+### Fetch API
+
+_Fetch API_ adalah _interface_ modern JavaScript untuk melakukan _request_ HTTP yang menggantikan _XMLHttpRequest_. _Fetch_ menggunakan _Promise_ sehingga kode lebih bersih dan mudah dibaca. Sintaks dasarnya adalah `fetch(url)` yang mengembalikan _Promise_ yang _resolve_ ke _Response object_. Untuk mendapatkan data JSON, digunakan _method_ `.json()` pada _response_. _Fetch_ juga mendukung `async/await` yang membuat kode _asynchronous_ terlihat seperti _synchronous_.
+
+### JSON (JavaScript Object Notation)
+
+JSON adalah format pertukaran data yang ringan dan mudah dibaca manusia. Formatnya menggunakan pasangan _key-value_ dalam kurung kurawal `{}` untuk objek dan kurung siku `[]` untuk _array_. Dalam konteks PHP, fungsi `json_encode()` digunakan untuk mengubah _array_ PHP menjadi string JSON, sedangkan di JavaScript, `response.json()` digunakan untuk _parsing_ JSON menjadi objek JavaScript. Keuntungan JSON adalah ukurannya kecil dan bisa langsung diproses oleh JavaScript tanpa _parsing_ tambahan.
+
+### Client-_Server_ Architecture
+
+Dalam implementasi AJAX, terdapat dua komponen utama:
+
+- \*_Server_ Side* (PHP): Bertanggung jawab menyediakan data, biasanya dari database atau *array*, kemudian mengubahnya menjadi format JSON dengan *header\* `Content-Type: application/json`.
+- _Client Side_ (HTML/JavaScript): Bertanggung jawab meminta data ke _server_ menggunakan _fetch_, kemudian memanipulasi DOM untuk menampilkan data tanpa _reload_ halaman.
+
+### DOM Manipulation
+
+DOM (_Document Object Model_) adalah representasi struktural halaman HTML yang dapat dimanipulasi oleh JavaScript. Dalam AJAX, setelah data diterima dari _server_, JavaScript menggunakan _method_ seperti `document.getElementById()`, `innerHTML`, `createElement()`, dan `appendChild()` untuk menyisipkan atau memperbarui elemen HTML secara dinamis sesuai data yang diterima.
+
+---
+
+## 2. Hasil Praktikum
+
+### a. Source Code
+
+Pada Tugas Modul 10 ini, dikembangkan aplikasi Tampilan Profil dengan AJAX yang menerapkan konsep _Fetch API_ untuk mengambil data dari _server_ secara _asynchronous_, JSON sebagai format pertukaran data antara PHP dan JavaScript, _DOM Manipulation_ untuk menampilkan data dinamis ke halaman, _Event Handling_ untuk merespons klik tombol, serta _Error Handling_ dengan _try-catch_ untuk menangani kesalahan jaringan atau _server_.
+
+Aplikasi terdiri dari 2 file:
+
+1. `server-modul10.php` → File _server_ yang menyediakan data dalam format JSON
+2. `client-modul10.html` → File _client_ yang menampilkan UI dan mengambil data via AJAX
+
+---
+
+### `server-modul10.php`
+
+```php
+<?php
+
+// Set header agar browser tahu ini adalah data JSON
 header('Content-Type: application/json');
 
-2. _Membuat File Client_ (index.html)
-Buat tombol dengan teks "Tampilkan Profil".
-Siapkan tempat untuk menampilkan data, misalnya:
-<div id="hasil-profil"></div>
+// Data sederhana (simulasi database)
+ $data = [
+    ['nama' => 'Budi', 'pekerjaan' => 'Web Developer', 'lokasi' => 'Jakarta'],
+    ['nama' => 'Diva', 'pekerjaan' => 'Data Scientist', 'lokasi' => 'Semarang'],
+    ['nama' => 'Alpukat', 'pekerjaan' => 'Mobile Developer', 'lokasi' => 'Surabaya']
+];
 
-3. _Membuat Logika AJAX (JavaScript)_
-   Tambahkan event ketika tombol diklik.
-   Gunakan fetch() (atau boleh pakai XMLHttpRequest / jQuery AJAX) untuk mengambil data dari data.php.
-   Ambil hasil response dalam bentuk JSON.
-
-Tampilkan data tersebut ke dalam <div id="hasil-profil"> dengan format:
-_Nama: Budi | Pekerjaan: Web Developer | Lokasi: Jakarta_
-
-# Dasar Teori
-
-## 1. Apa Itu AJAX
-
-AJAX (Asynchronous JavaScript and XML) suatu teknik pemrograman berbasis web untuk menciptakan
-aplikasi web interaktif. Tujuannya adalah untuk memindahkan sebagian besar interaksi pada komputer user, melakukan pertukaran data dengan server di belakang layar, sehingga halaman web tidak harus dibaca ulang secara keseluruhan setiap kali seorang pengguna melakukan perubahan. Hal ini akan meningkatkan interaktivitas, kecepatan, dan usability.
-Secara umum, AJAX melibatkan dua hal yakni:
-
-1. Objek XMLHttpRequest bawaan browser (untuk meminta data dari sebuah web server).
-2. Javascript dan HTML DOM (untuk menampilkan data pada web browser).
-
-## 2. Cara Kerja AJAX
-
-<p align="center"><img width="407" height="209" alt="image" src="https://github.com/user-attachments/assets/d11d4513-0918-4ec6-8a27-9cd00c021964" /></p>
-
-Dalam aplikasinya, AJAX melakukan hal-hal berikut:
-
-1. Suatu event terjadi pada halaman web (seperti page loaded atau button clicked).
-2. Sebuah objek XMLHttpRequest dibuat oleh Javascript
-3. Objek XMLHttpRequest mengirimkan request kepada web server.
-4. Web server mengelola request.
-5. Web server mengirimkan response kepada client.
-6. Response dibaca oleh Javascript.
-7. Javascript melakukan perubahan pada halaman web menggunakan DOM.
-
-## 3. Event Handling
-
-ada contoh berikut, akan dilakukan perubahan halaman web menggunakan teknik AJAX. Berikut langkahlangkah yang perlu dilakukan:
-
-1. Pastikan PHP web server sudah berjalan dengan baik. Pada modul ini digunakan Apache web server
-   yang terdapat pada XAMPP v3.2.2.
-
-<p align="center"><img width="840" height="550" alt="image" src="https://github.com/user-attachments/assets/d974842f-cf95-4969-86df-80d5b82ec967" /></p>
-
-2. Akses folder htdocs pada local server, dan kemudian buat folder baru dengan nama seperti: ajax
-   <p align="center"><img width="934" height="251" alt="image" src="https://github.com/user-attachments/assets/db5feec4-ff23-4fee-bc00-e241eb3dbf1f" /></p>
-3. Buat file .txt berikut yang berfungsi sebagai pengganti konten halaman web.
-   ` <h1>AJAX</h1>
-    <p>AJAX is not a programming language.</p> 
-    <p>AJAX is a technique for accessing web servers from a web 
-    page.</p> 
-    <p>AJAX stands for Asynchronous JavaScript And XML.</p> 
-    `
-   Simpan file sebagai ajax_info.txt.
-4. Buat juga file HTML utama yang berisikan code sebagai berikut. Dan simpan sebagai index.html
-
+// Ubah array menjadi JSON dan tampilkan
+echo json_encode($data);
 ```
+
+Bagian penting dari kode tersebut meliputi:
+
+- `header('Content-Type: application/json')`: Memberitahu browser bahwa _response_ berupa data JSON, bukan HTML.
+- Array `$data`: Menyimpan 3 data profil (nama, pekerjaan, lokasi) sebagai simulasi _database_.
+- `json_encode($data)`: Mengubah _array_ PHP menjadi format JSON _string_.
+- `echo`: Mengirim hasil JSON ke _client_.
+
+### `client-modul10.php`
+
+```html
 <!DOCTYPE html>
-<html>
-<head>
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-     <h2>The jQuery AJAX</h2>
-     <p id="demo">Let AJAX change this text.</p>
-     <button type="button" id="changeBtn">Change Content</button>
-     <script>
-       $(document).ready(function() {
-         $("#changeBtn").click(function() {
-           $("#demo").load("ajax_info.txt");
-         });
-       });
-     </script>
-</body>
-</html
-```
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tugas Modul 10 - Ajax</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --blue-deep: #0056b3;
+        --blue-mid: #0074d9;
+        --blue-light: #f1f8ff;
+        --blue-border: #dee2e6;
+        --blue-stat: #f8f9fa;
+        --text-dark: #333;
+        --text-muted: #666;
+      }
 
-5. Tempatkan kedua file tersebut kedalam folder ajax yang telah dibuat pada langkah kedua sehingga
-posisi kedua file seperti berikut.
-<p align="center"><img width="977" height="411" alt="image" src="https://github.com/user-attachments/assets/841683af-536d-4875-b3c4-3065dcb09e22" /></p>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-6. Ketika anda mengakses halaman web tersebut pada alamat http://localhost/ajax/, tampilan yang
-akan muncul adalah seperti gambar 10-5.
-<p align="center"><img width="630" height="288" alt="image" src="https://github.com/user-attachments/assets/18169003-574b-41f3-9294-ccdb4733337d" /></p>
+      body {
+        font-family: "DM Sans", sans-serif;
+        background-color: var(--blue-border);
+        margin: 0;
+        padding: 20px;
+        color: var(--text-dark);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-7. Namun jika anda melakukan action yaitu menekan button Change Content, maka konten pada
-halaman web akan menjadi seperti ini.
-<p align="center"><img width="650" height="403" alt="image" src="https://github.com/user-attachments/assets/5248b9d8-86e2-4be6-928a-295ba3d3b267" /></p>
+      .container {
+        max-width: 560px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
 
-Berikut adalah penjelesannya:
+      .header {
+        background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+        color: white;
+        padding: 22px;
+        text-align: center;
+      }
 
-1. Peran terbesar AJAX pada kode di bawah ini adalah melakukan request ke server dan mengubah
-   konten halaman tanpa perlu me-refresh browser:
+      .header h1 {
+        margin: 0;
+        font-family: "DM Sans", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+      }
 
-```
-<script>
-  $(document).ready(function() {
-    $("#changeBtn").click(function() {
-      $("#demo").load("ajax_info.txt");
-    });
-  });
-</script>
-```
+      .header p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        opacity: 0.75;
+      }
 
-Code tersebut akan dieksekusi ketika halaman sudah siap (document ready) dan button dengan id
-"changeBtn" ditekan.
+      .content {
+        padding: 25px;
+      }
 
-2. Kode di atas menggunakan jQuery yang harus diinclude terlebih dahulu:
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+        color: #fff;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+        box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
+        position: relative;
+      }
 
-```
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-```
+      .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
 
-3. $(document).ready() memastikan bahwa kode jQuery akan dijalankan setelah halaman web selesai
-   dimuat sepenuhnya.
+      .btn:active {
+        transform: translateY(0);
+      }
 
-4. Event handler $("#changeBtn").click() akan mendeteksi kapan tombol dengan id "changeBtn" diklik
-   oleh user.
+      .btn.loading {
+        pointer-events: none;
+        opacity: 0.65;
+      }
 
-5. Method .load() akan melakukan request ke server untuk mengambil konten dari file "ajax_info.txt".
-   Sintaksnya:
+      .btn .btn-text {
+        transition: opacity 0.15s;
+      }
 
-```
-$("#demo").load("ajax_info.txt");
-```
+      .btn.loading .btn-text {
+        opacity: 0;
+      }
 
-Dimana:
-• #demo: elemen yang akan diubah kontennya
-• ajax_info.txt: file yang diminta dari server
+      .btn .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
 
-6. Proses request dilakukan secara asynchronous, yang berarti:
-   • Halaman web tetap responsif selama proses request
-   • User bisa melakukan interaksi lain sambil menunggu response
-   • Tidak ada refresh halaman saat konten diperbarui
+      .btn.loading .spinner {
+        display: block;
+      }
 
-7. Ketika server merespon dengan mengirimkan konten dari ajax_info.txt, jQuery akan otomatis
-   mengupdate isi dari elemen dengan id="demo".
+      @keyframes spin {
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
 
-## 4. Implementasi AJAX dengan JQuery
+      #hasil-profil {
+        margin-top: 20px;
+      }
 
-AJAX dengan jQuery dapat diimplementasikan menggunakan metode $.ajax() yang menyediakan kontrol
-detail dalam melakukan request. Metode ini sangat berguna ketika kita membutuhkan penanganan yang
-lebih spesifik terhadap response dari server atau ingin menambahkan konfigurasi tambahan pada request AJAX.
-Berikut adalah contoh implementasi AJAX menggunakan metode $.ajax():
+      .placeholder {
+        color: #aaa;
+        font-size: 13px;
+        font-style: italic;
+        text-align: center;
+        padding: 16px 0;
+      }
 
-```
-<!DOCTYPE html>
-<html>
+      .profil-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 1px solid #eee;
+        padding: 16px 10px;
+        opacity: 0;
+        transform: translateY(8px);
+        animation: fadeUp 0.35s ease-out forwards;
+        transition: background 0.15s;
+      }
 
-<head>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
+      .profil-item:last-child {
+        border-bottom: none;
+      }
 
-<body>
-    <h2>The jQuery AJAX</h2>
-    <p id="demo">Let AJAX change this text.</p>
-    <button type="button" id="changeBtn">Change Content</button>
+      .profil-item:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+
+      .profil-item:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+
+      .profil-item:nth-child(3) {
+        animation-delay: 0.19s;
+      }
+
+      .profil-item:hover {
+        background-color: var(--blue-light);
+      }
+
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .avatar svg {
+        width: 22px;
+        height: 22px;
+        color: #fff;
+      }
+
+      .profil-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .profil-nama {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+      }
+
+      .profil-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .meta-item svg {
+        width: 13px;
+        height: 13px;
+        color: var(--blue-deep);
+        flex-shrink: 0;
+        opacity: 0.6;
+      }
+
+      .error-msg {
+        color: #721c24;
+        font-size: 13px;
+        line-height: 1.6;
+        padding: 14px 16px;
+        border-radius: 5px;
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+
+        .content {
+          padding: 18px;
+        }
+
+        .header {
+          padding: 18px;
+        }
+
+        .header h1 {
+          font-size: 18px;
+        }
+
+        .profil-meta {
+          gap: 10px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <symbol
+        id="icon-user"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </symbol>
+      <symbol
+        id="icon-briefcase"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      </symbol>
+      <symbol
+        id="icon-map-pin"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </symbol>
+    </svg>
+
+    <div class="container">
+      <div class="header">
+        <h1>Tugas Modul 10</h1>
+        <p>Mengambil data dari server dengan AJAX</p>
+      </div>
+
+      <div class="content">
+        <button class="btn" id="btnTampilkan" type="button">
+          <span class="btn-text">Tampilkan Profil</span>
+          <span class="spinner"></span>
+        </button>
+
+        <div id="hasil-profil">
+          <p class="placeholder">Belum ada data. Klik tombol di atas.</p>
+        </div>
+      </div>
+    </div>
+
     <script>
-        $(document).ready(function () {
-            $("#changeBtn").click(function () {
-                $.ajax({
-                    // URL yang akan diakses
-                    url: "ajax_info.txt",
-                    // Metode HTTP yang digunakan (POST/GET)
-                    type: "GET",
-                    // Data yang dikirim ke server
-                    data: {
-                        id: 123,
-                        name: "John"
-                    },
-                    // Tipe data yang diharapkan dari server
-                    dataType: "html",
-                    // Waktu timeout dalam milidetik (5 detik)
-                    timeout: 5000,
-                    // Callback ketika request berhasil
-                    success: function (result) {
-                        $("#demo").html(result);
-                    },
-                    // Callback ketika request gagal
-                    error: function (xhr, status, error) {
-                        $("#demo").html("Error: " + error);
-                    },
-                    // Callback yang selalu dijalankan setelah request selesai
-                    complete: function (xhr, status) {
-                        console.log("Request completed with status: " + status);
-                    }
-                });
-            });
-        });
-    </script>
-</body>
+      const btn = document.getElementById("btnTampilkan");
+      const hasil = document.getElementById("hasil-profil");
 
+      btn.addEventListener("click", async function () {
+        this.classList.add("loading");
+
+        try {
+          const response = await fetch("server-modul10.php");
+
+          if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+          }
+
+          const data = await response.json();
+          hasil.innerHTML = "";
+
+          data.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "profil-item";
+
+            div.innerHTML = `
+                        <div class="avatar">
+                            <svg><use href="#icon-user"/></svg>
+                        </div>
+                        <div class="profil-info">
+                            <div class="profil-nama">${item.nama}</div>
+                            <div class="profil-meta">
+                                <span class="meta-item">
+                                    <svg><use href="#icon-briefcase"/></svg>
+                                    ${item.pekerjaan}
+                                </span>
+                                <span class="meta-item">
+                                    <svg><use href="#icon-map-pin"/></svg>
+                                    ${item.lokasi}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+
+            hasil.appendChild(div);
+          });
+        } catch (error) {
+          hasil.innerHTML = `
+                    <div class="error-msg">
+                        Gagal mengambil data. Pastikan file data.php ada di folder yang sama
+                        dan halaman dibuka melalui server lokal (XAMPP / php -S).
+                    </div>
+                `;
+        } finally {
+          this.classList.remove("loading");
+        }
+      });
+    </script>
+  </body>
 </html>
 ```
 
-Dalam konteks jQuery AJAX ada yang dikenal sebagai options atau parameter konfigurasi. Ini adalah
-properti-properti yang digunakan untuk mengkonfigurasi request AJAX. Options ini memungkinkan kita
-untuk menentukan berbagai aspek dari request AJAX, mulai dari URL tujuan, metode yang digunakan, data yang dikirim, hingga tipe data yang diharapkan dari server. Berikut adalah penjelasan setiap options atau parameter konfigurasi:
+Bagian penting dari kode tersebut meliputi:
 
-| Option   | Description                                            |
-| -------- | ------------------------------------------------------ |
-| url      | Menentukan endpoint yang akan diakses                  |
-| type     | Menentukan metode HTTP (GET/POST)                      |
-| data     | Object berisi parameter yang akan dikirim              |
-| dataType | Menentukan tipe data response yang diharapkan          |
-| timeout  | Batas waktu tunggu response dari server                |
-| success  | Handler ketika request berhasil                        |
-| error    | Handler ketika request gagal                           |
-| complete | Handler yang selalu dijalankan setelah request selesai |
+- _Server_ (`server-modul10.php`): Menyediakan data _array_ dalam format JSON menggunakan `json_encode()` dengan _header_ `Content-Type: application/json`.
+- _Event Click_: Tombol "Tampilkan Profil" memicu fungsi `async` untuk menjalankan AJAX.
+- _Fetch API_: `fetch('server-modul10.php')` mengirim _request_ GET ke _server_ secara _asynchronous_ (tanpa _reload_).
+- _Loading State_: Class `.loading` menampilkan _spinner_ dan menonaktifkan tombol sambil menunggu _response_.
+- _JSON Parse_: `response.json()` mengubah _string_ JSON dari _server_ menjadi objek JavaScript.
+- *DOM Manipulatio*n: `forEach` _loop_ membuat elemen `<div>` dinamis untuk setiap profil, lalu `appendChild()` menambahkannya ke `#hasil-profil`.
+- _Error Handling_: `try-catch-finally` menangani _error_ (koneksi gagal/file tidak ditemukan) dan selalu menghapus _state loading_ di `finally`.
 
-# PENGERJAAN
+---
 
-## 1.1 Struktur File
+### b. Screenshot Output
 
-Program terdiri dari dua file yang diletakkan dalam satu folder project:
+Langkah Menjalankan Program:
 
-| File       | Peran              | Keterangan                                              |
-| ---------- | ------------------ | ------------------------------------------------------- |
-| data.php   | Server / Back-end  | Menyimpan data profil dan mengembalikannya sebagai JSON |
-| index.html | Client / Front-end | Antarmuka pengguna; berisi tombol dan area tampil data  |
+- Buka XAMPP, klik _Start_ pada _service_ Apache hingga berwarna hijau.
+- Letakkan file `.php` di dalam folder `C:\xampp\htdocs\Praktikum-ABP` (sesuaikan nama folder).
+- Buka browser, ketik `localhost/Praktikum-ABP/client-modul10.html` pada address bar, lalu Enter.
 
-## 1.2 Penjelasan Program
+Berikut adalah tampilan output dari Tugas Modul 10.
 
-### File Server (data.php)
+**Tampilan Awal (Sebelum Klik Tombol):**
 
-File data.php berfungsi sebagai back-end sederhana. Langkah-langkah di dalamnya adalah:
+![Tampilan Profil](images/output1.png)
 
-- Mendeklarasikan header Content-Type: application/json agar browser tahu bahwa respons yang dikirim adalah data JSON.
-- Mendefinisikan array asosiatif berisi data profil mahasiswa dengan key nama, pekerjaan, dan lokasi.
-- Mengonversi array tersebut menjadi string JSON menggunakan fungsi json_encode().
-- Menampilkan hasil JSON ke output menggunakan echo.
-  Kode:
+Halaman menampilkan judul "Tugas Modul 10", deskripsi "Mengambil data dari server dengan AJAX", tombol biru "Tampilkan Profil", dan teks placeholder "Belum ada data. Klik tombol di atas."
 
-```
-<?php
-header('Content-Type: application/json');
+**Tampilan Setelah Klik Tombol (Data Berhasil Dimuat):**
 
-$profil = [
-    'nama'      => 'Andika Neviantoro',
-    'pekerjaan' => 'UI/UX & Web Developer',
-    'lokasi'    => 'Cilacap'
-];
+![Tampilan Profil](images/output2.png)
 
-echo json_encode($profil);
-?>
-```
+Setelah tombol diklik, halaman tidak _reload_ sama sekali. Data diambil dari server via AJAX dan ditampilkan dalam bentuk 3 kartu profil dengan animasi _fade-up_ bertahap.
 
-### File Client (index.html)
+**Tampilan Error (Jika Server Tidak Ditemukan):**
 
-File index.html merupakan antarmuka yang dilihat pengguna. Komponen utamanya terdiri dari:
+![Tampilan Profil](images/output3.png)
 
-- Sebuah tombol dengan teks "Tampilkan Profil" yang memiliki id btn-tampilkan.
-- Elemen <div id="hasil-profil"> sebagai wadah untuk menampilkan data yang diterima dari server.
-- Blok <script> yang berisi logika AJAX menggunakan JavaScript fetch().
+Jika file `server-modul10.php` tidak ditemukan atau server error, ditampilkan pesan error berwarna merah dengan penjelasan solusi: "Gagal mengambil data. Pastikan file data.php ada di folder yang sama dan halaman dibuka melalui server lokal."
 
-Kode JavaScript(fetch):
-
-```
-document.getElementById('btn-tampilkan')
-  .addEventListener('click', function () {
-    fetch('data.php')
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
-        var div = document.getElementById('hasil-profil');
-        div.style.display = 'block';
-        div.innerHTML = 'Nama: ' + data.nama +
-                        ' | Pekerjaan: ' + data.pekerjaan +
-                        ' | Lokasi: ' + data.lokasi;
-      })
-      .catch(function (error) { console.error(error); });
-  });
-```
-
-## 1.3 Alurr Kerja AJAX
-
-Berikut adalah alur kerja komunikasi antara client dan server dalam program ini:
-
-| Langkah | Komponen           | Keterangan                                                                       |
-| ------: | ------------------ | -------------------------------------------------------------------------------- |
-|       1 | index.html         | User klik tombol **"Tampilkan Profil"**                                          |
-|       2 | JavaScript (fetch) | Browser mengirim HTTP GET request ke `data.php` tanpa reload halaman             |
-|       3 | data.php           | Server memproses request, mengembalikan data dalam format JSON                   |
-|       4 | JavaScript (.then) | Response JSON di-parse lalu data ditampilkan ke elemen `<div id="hasil-profil">` |
-
-## 1.4 Output Program
-
-Tampilan awal run localhost:
-
-<p align="center"><img width="697" height="299" alt="image" src="https://github.com/user-attachments/assets/f3888d60-706b-4e05-8716-43af28e33587" /></p>
-
-Ketika tombol "Tampilkan Profil" diklik, program akan menampilkan teks berikut di dalam div tanpa reload halaman:
-
-<p align="center"><img width="955" height="340" alt="image" src="https://github.com/user-attachments/assets/5a3820a6-3e6d-41b8-8cdb-9dcd9ddc4449" /></p>
-
-Data tersebut diambil dari data.php secara asinkron oleh JavaScript, lalu ditampilkan langsung ke elemen HTML tanpa menyebabkan halaman ter-refresh
-
-## 1.5 Kesimpulan
-
-Program AJAX ini berhasil mendemonstrasikan komunikasi asinkron antara client dan server menggunakan JavaScript fetch() dan PHP. Teknologi AJAX memungkinkan halaman web menjadi lebih responsif karena data dapat diambil dan ditampilkan secara dinamis tanpa perlu memuat ulang seluruh halaman. Konsep ini menjadi dasar penting dalam pengembangan aplikasi web modern
-#   m o d u l - 1 0 - a r v a n - m u r b i y a n t o 
- 
- 
+---

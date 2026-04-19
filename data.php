@@ -1,14 +1,14 @@
-//Andika Neviantoro
-//2311102167
-
 <?php
+
+// Set header agar browser tahu ini adalah data JSON
 header('Content-Type: application/json');
 
-$profil = [
-    'nama'      => 'Andika Neviantoro',
-    'pekerjaan' => 'UI/UX & Web Developer',
-    'lokasi'    => 'Cilacap'
+// Data sederhana (simulasi database)
+$data = [
+    ['nama' => 'Budi', 'pekerjaan' => 'Web Developer', 'lokasi' => 'Jakarta'],
+    ['nama' => 'Diva', 'pekerjaan' => 'Data Scientist', 'lokasi' => 'Semarang'],
+    ['nama' => 'Alpukat', 'pekerjaan' => 'Mobile Developer', 'lokasi' => 'Surabaya']
 ];
 
-echo json_encode($profil);
-?>
+// Ubah array menjadi JSON dan tampilkan
+echo json_encode($data);
