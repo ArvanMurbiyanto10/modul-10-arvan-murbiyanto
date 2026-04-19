@@ -124,7 +124,7 @@ Bagian penting dari kode tersebut meliputi:
 ### `index.html`
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -136,10 +136,10 @@ Bagian penting dari kode tersebut meliputi:
     />
     <style>
       :root {
-        --blue-deep: #0056b3;
-        --blue-mid: #0074d9;
-        --blue-light: #f1f8ff;
-        --blue-border: #dee2e6;
+        --blue-deep: #091369;
+        --blue-mid: #1079f0;
+        --blue-light: #f1fff7;
+        --blue-border: #10e8f0;
         --blue-stat: #f8f9fa;
         --text-dark: #333;
         --text-muted: #666;
@@ -407,7 +407,7 @@ Bagian penting dari kode tersebut meliputi:
   </head>
 
   <body>
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
       <symbol
         id="icon-user"
         viewBox="0 0 24 24"
@@ -449,7 +449,7 @@ Bagian penting dari kode tersebut meliputi:
     <div class="container">
       <div class="header">
         <h1>Tugas Modul 10</h1>
-        <p>Mengambil data dari server dengan AJAX</p>
+        <p>Pengambilan data dari server dengan AJAX</p>
       </div>
 
       <div class="content">
@@ -472,7 +472,7 @@ Bagian penting dari kode tersebut meliputi:
         this.classList.add("loading");
 
         try {
-          const response = await fetch("server-modul10.php");
+          const response = await fetch("data.php");
 
           if (!response.ok) {
             throw new Error("Server error: " + response.status);
@@ -520,6 +520,7 @@ Bagian penting dari kode tersebut meliputi:
     </script>
   </body>
 </html>
+
 ```
 
 Bagian penting dari kode tersebut meliputi:
