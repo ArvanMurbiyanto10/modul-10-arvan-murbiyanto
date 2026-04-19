@@ -94,7 +94,7 @@ Aplikasi terdiri dari 2 file:
 
 ---
 
-### `server-modul10.php`
+### `data.php`
 
 ```php
 <?php
@@ -103,14 +103,15 @@ Aplikasi terdiri dari 2 file:
 header('Content-Type: application/json');
 
 // Data sederhana (simulasi database)
- $data = [
-    ['nama' => 'Budi', 'pekerjaan' => 'Web Developer', 'lokasi' => 'Jakarta'],
-    ['nama' => 'Diva', 'pekerjaan' => 'Data Scientist', 'lokasi' => 'Semarang'],
-    ['nama' => 'Alpukat', 'pekerjaan' => 'Mobile Developer', 'lokasi' => 'Surabaya']
+$data = [
+    ['nama' => 'Arvan', 'pekerjaan' => 'Web Developer', 'lokasi' => 'Tegal'],
+    ['nama' => 'Aji', 'pekerjaan' => 'Data Scientist', 'lokasi' => 'Baseh'],
+    ['nama' => 'Arnanda', 'pekerjaan' => 'Mobile Developer', 'lokasi' => 'Cilacap']
 ];
 
 // Ubah array menjadi JSON dan tampilkan
 echo json_encode($data);
+
 ```
 
 Bagian penting dari kode tersebut meliputi:
@@ -120,7 +121,7 @@ Bagian penting dari kode tersebut meliputi:
 - `json_encode($data)`: Mengubah _array_ PHP menjadi format JSON _string_.
 - `echo`: Mengirim hasil JSON ke _client_.
 
-### `client-modul10.php`
+### `index.html`
 
 ```html
 <!DOCTYPE html>
