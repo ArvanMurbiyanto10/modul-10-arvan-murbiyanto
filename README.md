@@ -89,8 +89,8 @@ Pada Tugas Modul 10 ini, dikembangkan aplikasi Tampilan Profil dengan AJAX yang 
 
 Aplikasi terdiri dari 2 file:
 
-1. `server-modul10.php` → File _server_ yang menyediakan data dalam format JSON
-2. `client-modul10.html` → File _client_ yang menampilkan UI dan mengambil data via AJAX
+1. `data.php` → File _server_ yang menyediakan data dalam format JSON
+2. `index.html` → File _client_ yang menampilkan UI dan mengambil data via AJAX
 
 ---
 
